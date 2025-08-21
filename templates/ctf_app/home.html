@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HackNet CTF - Flag Submission</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier Prime', monospace;
+            background: #0a0e1a;
+            color: #00d4aa;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-y: hidden;
+        }
+
+        /* Animated grid background */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 212, 170, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 170, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: gridMove 30s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 30px); }
+        }
+
+        /* Glitch effect overlay */
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.05;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(255, 0, 150, 0.1) 2px,
+                rgba(255, 0, 150, 0.1) 4px
+            );
+            animation: glitchScan 8s infinite;
+        }
+
+        @keyframes glitchScan {
+            0%, 100% { transform: translateY(-100%); }
+            50% { transform: translateY(100vh); }
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 700px;
+            padding: 1rem;
+            max-height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 1rem;
+            animation: slideDown 1s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ascii-logo {
+            font-size: 0.35rem;
+            line-height: 0.4rem;
+            color: #ff006e;
+            margin-bottom: 0.5rem;
+            white-space: pre;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+        }
+
+        .status-bar {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid #00d4aa;
+            border-radius: 4px;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-success { color: #00ff88; }
+        .status-warning { color: #ffaa00; }
+
+        .submission-panel {
+            background: #0f1419;
+            border: 2px solid #ff006e;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 
+                0 0 30px rgba(255, 0, 110, 0.3),
+                inset 0 0 30px rgba(0, 212, 170, 0.1);
+            animation: panelGlow 4s ease-in-out infinite alternate;
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes panelGlow {
+            from {
+                box-shadow: 
+                    0 0 30px rgba(255, 0, 110, 0.3),
+                    inset 0 0 30px rgba(0, 212, 170, 0.1);
+            }
+            to {
+                box-shadow: 
+                    0 0 50px rgba(255, 0, 110, 0.5),
+                    inset 0 0 50px rgba(0, 212, 170, 0.2);
+            }
+        }
+
+        .panel-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            color: #ff006e;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.3rem;
+            text-shadow: 0 0 15px rgba(255, 0, 110, 0.8);
+        }
+
+        .panel-subtitle {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .challenge-image {
+            background: #1a1f2e;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .challenge-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 170, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1a1f2e 100%);
+            border: 2px dashed #00d4aa;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 0.8rem;
+        }
+
+        .image-content {
+            text-align: center;
+            z-index: 2;
+        }
+
+        .image-icon {
+            font-size: 3rem;
+            color: #00d4aa;
+            margin-bottom: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .image-text {
+            color: #00d4aa;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .image-subtext {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .binary-rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            opacity: 0.1;
+        }
+
+        .binary-char {
+            position: absolute;
+            color: #00d4aa;
+            font-size: 0.8rem;
+            animation: fall 3s linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-20px); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(220px); opacity: 0; }
+        }
+
+        .image-caption {
+            color: #ffaa00;
+            font-size: 0.75rem;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .challenge-info {
+            background: rgba(255, 0, 110, 0.1);
+            border-left: 4px solid #ff006e;
+            padding: 0.8rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .evidence-img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #00d4aa;
+            border-radius: 6px;
+            box-shadow: 0 0 15px rgba(0, 212, 170, 0.4);
+        }
+
+        .info-title {
+            color: #ff006e;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .info-content {
+            color: #ccc;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .flag-input-group {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .flag-label {
+            color: #00d4aa;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .flag-label::before {
+            content: '🚩 ';
+            margin-right: 0.5rem;
+        }
+
+        .flag-input {
+            width: 100%;
+            background: #1a1f2e;
+            border: 2px solid #333;
+            border-radius: 6px;
+            padding: 0.8rem;
+            color: #00d4aa;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .flag-input:focus {
+            outline: none;
+            border-color: #00d4aa;
+            box-shadow: 0 0 15px rgba(0, 212, 170, 0.4);
+            background: #0f1419;
+        }
+
+        .flag-input::placeholder {
+            color: #555;
+            font-style: italic;
+        }
+
+        .flag-format {
+            color: #666;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .submit-button {
+            width: 100%;
+            background: linear-gradient(45deg, #ff006e, #8338ec);
+            border: none;
+            border-radius: 6px;
+            padding: 1rem;
+            color: white;
+            font-family: 'Courier Prime', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-top: 0.8rem;
+        }
+
+        .submit-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 0, 110, 0.4);
+        }
+
+        .submit-button:hover::before {
+            left: 100%;
+        }
+
+        .submit-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .result-log {
+            background: #0a0e1a;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 0.8rem;
+            margin-top: 1rem;
+            max-height: 120px;
+            overflow-y: auto;
+            font-size: 0.75rem;
+            display: none;
+            scrollbar-width: thin;
+            scrollbar-color: #00d4aa #1a1f2e;
+        }
+
+        .result-log::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .result-log::-webkit-scrollbar-track {
+            background: #1a1f2e;
+        }
+
+        .result-log::-webkit-scrollbar-thumb {
+            background: #00d4aa;
+            border-radius: 3px;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+            display: flex;
+        }
+
+        .log-timestamp {
+            color: #666;
+            margin-right: 1rem;
+            min-width: 80px;
+        }
+
+        .log-success { color: #00ff88; }
+        .log-error { color: #ff4757; }
+        .log-warning { color: #ffaa00; }
+        .log-info { color: #00d4aa; }
+
+        .footer-stats {
+            text-align: center;
+            margin-top: 1rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid #333;
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .stat-item {
+            display: inline-block;
+            margin: 0 1rem;
+            padding: 0.3rem 0.8rem;
+            border: 1px solid #333;
+            border-radius: 20px;
+            background: rgba(0, 212, 170, 0.1);
+        }
+
+        /* Security overlay for unauthorized access */
+        .access-denied-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff4757;
+            font-family: 'Courier Prime', monospace;
+            text-align: center;
+            animation: securityAlert 1s ease-in-out;
+        }
+
+        @keyframes securityAlert {
+            0%, 100% { background: rgba(0, 0, 0, 0.95); }
+            50% { background: rgba(255, 0, 0, 0.1); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 0.5rem;
+                max-width: 95%;
+            }
+            
+            .ascii-logo {
+                font-size: 0.25rem;
+                line-height: 0.3rem;
+            }
+            
+            .submission-panel {
+                padding: 1rem;
+            }
+            
+            .panel-title {
+                font-size: 1rem;
+                letter-spacing: 1px;
+            }
+            
+            .image-placeholder {
+                height: 150px;
+            }
+            
+            .image-icon {
+                font-size: 2rem;
+            }
+            
+            .flag-input {
+                padding: 0.6rem;
+                font-size: 0.85rem;
+            }
+            
+            .submit-button {
+                padding: 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-height: 700px) {
+            .ascii-logo {
+                font-size: 0.3rem;
+                line-height: 0.35rem;
+                margin-bottom: 0.3rem;
+            }
+            
+            .header-section {
+                margin-bottom: 0.5rem;
+            }
+            
+            .submission-panel {
+                padding: 1rem;
+            }
+            
+            .image-placeholder {
+                height: 300px;
+            }
+            
+            .challenge-info {
+                padding: 0.6rem;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <div class="glitch-overlay"></div>
+    
+    <div class="main-container">
+        <div class="header-section">
+            <div class="ascii-logo">
+██╗  ██╗ █████╗  ██████╗██╗  ██╗███╗   ██╗███████╗████████╗
+██║  ██║██╔══██╗██╔════╝██║ ██╔╝████╗  ██║██╔════╝╚══██╔══╝
+███████║███████║██║     █████╔╝ ██╔██╗ ██║█████╗     ██║   
+██╔══██║██╔══██║██║     ██╔═██╗ ██║╚██╗██║██╔══╝     ██║   
+██║  ██║██║  ██║╚██████╗██║  ██╗██║ ╚████║███████╗   ██║   
+╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝   ╚═╝   
+            </div>
+        </div>
+
+        <div class="submission-panel">
+            <div class="panel-header">
+                <div class="panel-title">Flag Submission</div>
+                <div class="panel-subtitle">Submit Your Captured Flag</div>
+            </div>
+
+            <div class="challenge-image">
+                <div class="image-placeholder">
+                    {% load static %}
+                    <img src="{% static 'images/image.jpeg' %}" alt="Evidence Found" class="evidence-img">
+                    <div class="binary-rain" id="binaryRain"></div>
+                </div>
+            </div>
+            <a href="{% static 'images/image.jpeg' %}" target="_blank">Click to Full View</a> <br>
+            <div class="challenge-info">
+                <div class="info-title">🎯 CHALLENGE OBJECTIVE</div>
+                <div class="info-content">
+                    You have successfully gained access to the system. Your final task is to submit the 
+                    flag. <br>
+                    <h2><b>Find the manufacturing date and insurance company of the farthest bus in the above image.</b></h2>
+                </div>
+            </div>
+
+            <form id="flagForm">
+                {% csrf_token %}
+                <div class="flag-input-group">
+                    <label class="flag-label">Captured Flag</label>
+                    <input 
+                        type="text" 
+                        class="flag-input" 
+                        id="flagInput" 
+                        name="flag"
+                        required
+                        autocomplete="off"
+                        placeholder="Enter the flag here..."
+                    >
+                    <div class="flag-format">Format: ddmmyyyy_companyname (case insensitive)</div>
+                </div>
+                <button type="submit" class="submit-button" id="submitBtn">
+                    🚀 Submit Flag
+                </button>
+            </form>
+
+            <div class="result-log" id="resultLog"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("contextmenu", function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener("keydown", function(e) {
+            if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 'I' || e.key === 'i')) {
+                e.preventDefault();
+            }
+            if (e.key === 'F12') {
+                e.preventDefault();
+            }
+        });
+
+        // Django-specific flag submission handling
+        const successMessages = [
+            { time: "13:45:01", type: "info",    msg: "🔍 Flag validation initiated..." },
+            { time: "13:45:02", type: "info",    msg: "🔍 Checking flag format..." },
+            { time: "13:45:03", type: "success", msg: "✅ Format validation: PASSED" },
+            { time: "13:45:04", type: "info",    msg: "🔍 Verifying flag authenticity..." },
+            { time: "13:45:05", type: "success", msg: "🎯 Flag authenticated successfully!" },
+            { time: "13:45:06", type: "success", msg: "🏆 Challenge completed! +150 points awarded." },
+            { time: "13:45:07", type: "success", msg: "🎊 Congratulations, elite hacker!" }
+        ];
+
+        const failureMessages = [
+            { time: "13:45:01", type: "info",    msg: "🔍 Flag validation initiated..." },
+            { time: "13:45:02", type: "info",    msg: "🔍 Checking flag format..." },
+            { time: "13:45:03", type: "warning", msg: "⚠️ Format validation: WARNING" },
+            { time: "13:45:04", type: "error",   msg: "❌ Invalid flag! Access denied." },
+            { time: "13:45:05", type: "info",    msg: "💡 Hint: Examine the image more carefully..." }
+        ];
+
+        let isProcessing = false;
+
+        function addLogEntry(timestamp, type, message) {
+            const logContainer = document.getElementById('resultLog');
+            if (!logContainer) return;
+            
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="log-${type}">${message}</span>
+            `;
+            logContainer.appendChild(entry);
+            
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function processFlag(isSuccess) {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            const logContainer = document.getElementById('resultLog');
+            if (logContainer) {
+                logContainer.style.display = 'block';
+                logContainer.innerHTML = '';
+            }
+
+            const messages = isSuccess ? successMessages : failureMessages;
+            let messageIndex = 0;
+
+            function showNextMessage() {
+                if (messageIndex < messages.length) {
+                    const msg = messages[messageIndex];
+                    addLogEntry(msg.time, msg.type, msg.msg);
+                    messageIndex++;
+                    setTimeout(showNextMessage, 700 + Math.random() * 300);
+                } else {
+                    isProcessing = false;
+                    const submitBtn = document.getElementById('submitBtn');
+                    if (submitBtn) {
+                        submitBtn.textContent = '🚀 SUBMIT FLAG';
+                        submitBtn.disabled = false;
+                    }
+
+                    if (isSuccess) {
+                        setTimeout(() => {
+                            triggerSuccessCelebration();
+                        }, 500);
+
+                        setTimeout(() => {
+                            const submissionPanel = document.querySelector('.submission-panel');
+                            if (submissionPanel) {
+                                submissionPanel.classList.add('victory-animation');
+                            }
+
+                            const modal = document.createElement('div');
+                            modal.style.cssText = `
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                width: 100vw;
+                                height: 100vh;
+                                background: rgba(0, 0, 0, 0.9);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                z-index: 10000;
+                                animation: fadeIn 0.3s ease-out;
+                            `;
+                            
+                            modal.innerHTML = `
+                                <div style="
+                                    background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+                                    border: 3px solid #00ff88;
+                                    border-radius: 15px;
+                                    padding: 3rem;
+                                    text-align: center;
+                                    max-width: 500px;
+                                    box-shadow: 0 0 50px rgba(0, 255, 136, 0.5);
+                                    animation: modalSlideIn 0.5s ease-out;
+                                    color: #00d4aa;
+                                    font-family: 'Courier Prime', monospace;
+                                ">
+                                    <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+                                    <h2 style="color: #00ff88; font-size: 2rem; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);">
+                                        CHALLENGE COMPLETED!
+                                    </h2>
+                                    <p style="font-size: 1.2rem; margin-bottom: 1rem; color: #00d4aa;">
+                                        🏆 Congratulations
+                                    </p>
+                                    <button onclick="this.parentElement.parentElement.remove()" style="
+                                        background: linear-gradient(45deg, #00ff88, #00d4aa);
+                                        border: none;
+                                        padding: 1rem 2rem;
+                                        border-radius: 8px;
+                                        color: #0a0e1a;
+                                        font-weight: bold;
+                                        cursor: pointer;
+                                        font-size: 1rem;
+                                        text-transform: uppercase;
+                                        letter-spacing: 1px;
+                                        transition: all 0.3s ease;
+                                    " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                                        Close
+                                    </button>
+                                </div>
+                            `;
+                            
+                            document.body.appendChild(modal);
+                            
+                        }, 2000);
+                    }
+                }
+            }
+
+            showNextMessage();
+        }
+
+        function createConfetti() {
+            const colors = ['#ff006e', '#8338ec', '#00d4aa', '#ffaa00', '#00ff88'];
+            const confettiCount = 150;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: fixed;
+                        width: ${Math.random() * 10 + 5}px;
+                        height: ${Math.random() * 10 + 5}px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        left: ${Math.random() * 100}vw;
+                        top: -10px;
+                        z-index: 9999;
+                        border-radius: 50%;
+                        pointer-events: none;
+                        animation: confetti-fall ${Math.random() * 3 + 2}s linear forwards;
+                    `;
+                    
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        if (confetti.parentNode) {
+                            confetti.parentNode.removeChild(confetti);
+                        }
+                    }, 5000);
+                }, Math.random() * 300);
+            }
+        }
+
+        function createFirework(x, y) {
+            const colors = ['#ff006e', '#8338ec', '#00d4aa', '#ffaa00', '#00ff88'];
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const angle = (Math.PI * 2 * i) / particleCount;
+                const velocity = Math.random() * 100 + 50;
+                
+                particle.style.cssText = `
+                    position: fixed;
+                    width: 4px;
+                    height: 4px;
+                    background: ${color};
+                    border-radius: 50%;
+                    left: ${x}px;
+                    top: ${y}px;
+                    z-index: 9999;
+                    pointer-events: none;
+                `;
+                
+                document.body.appendChild(particle);
+                
+                const deltaX = Math.cos(angle) * velocity;
+                const deltaY = Math.sin(angle) * velocity;
+                
+                particle.animate([
+                    { 
+                        transform: 'translate(0, 0) scale(1)', 
+                        opacity: 1 
+                    },
+                    { 
+                        transform: `translate(${deltaX}px, ${deltaY}px) scale(0)`, 
+                        opacity: 0 
+                    }
+                ], {
+                    duration: 1000,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                }).onfinish = () => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                };
+            }
+        }
+
+        function triggerSuccessCelebration() {
+            setTimeout(() => {
+                createFirework(window.innerWidth * 0.2, window.innerHeight * 0.3);
+            }, 200);
+            
+            setTimeout(() => {
+                createFirework(window.innerWidth * 0.8, window.innerHeight * 0.4);
+            }, 400);
+            
+            setTimeout(() => {
+                createFirework(window.innerWidth * 0.5, window.innerHeight * 0.2);
+            }, 600);
+            
+            setTimeout(() => {
+                createConfetti();
+            }, 300);
+        }
+
+        // Add necessary CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes confetti-fall {
+                to {
+                    transform: translateY(100vh) rotate(720deg);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes fadeIn {
+                0% { opacity: 0; }
+                100% { opacity: 1; }
+            }
+            
+            @keyframes modalSlideIn {
+                from { transform: translateY(-50px) scale(0.9); opacity: 0; }
+                to { transform: translateY(0) scale(1); opacity: 1; }
+            }
+            
+            @keyframes victory-pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+            
+            .victory-animation {
+                animation: victory-pulse 0.6s ease-in-out 3;
+            }
+        `;
+        document.head.appendChild(style);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const flagForm = document.getElementById('flagForm');
+            if (flagForm) {
+                flagForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const flagInput = document.getElementById('flagInput');
+                    const flagValue = flagInput.value.trim();
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                    if (flagValue) {
+                        const btn = document.getElementById('submitBtn');
+                        btn.textContent = '⚡ PROCESSING...';
+                        btn.disabled = true;
+
+                        // Send flag submission to Django
+                        fetch('/submit_flag/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRFToken': csrfToken,
+                            },
+                            body: new URLSearchParams({
+                                'flag': flagValue,
+                                'csrfmiddlewaretoken': csrfToken
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            setTimeout(() => {
+                                processFlag(data.correct);
+                                if (!data.correct) {
+                                    flagInput.style.border = '2px solid #ff4757';
+                                    setTimeout(() => {
+                                        flagInput.style.border = '';
+                                    }, 2000);
+                                }
+                            }, 1000);
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            btn.textContent = '🚀 SUBMIT FLAG';
+                            btn.disabled = false;
+                            alert('Connection error. Please try again.');
+                        });
+                    }
+                });
+            }
+
+            // Set cookie functionality
+            fetch('/set_cookie/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: new URLSearchParams({
+                    'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                })
+            });
+
+            // Binary rain effect
+            function createBinaryRain() {
+                const binaryContainer = document.getElementById('binaryRain');
+                if (!binaryContainer) return;
+                
+                const chars = ['0', '1'];
+
+                setInterval(() => {
+                    const char = document.createElement('span');
+                    char.className = 'binary-char';
+                    char.textContent = chars[Math.floor(Math.random() * chars.length)];
+                    char.style.left = Math.random() * 100 + '%';
+                    char.style.animationDelay = Math.random() * 2 + 's';
+
+                    binaryContainer.appendChild(char);
+
+                    setTimeout(() => {
+                        if (char.parentNode) {
+                            char.parentNode.removeChild(char);
+                        }
+                    }, 3000);
+                }, 200);
+            }
+
+            createBinaryRain();
+
+            // Glitch effect for title
+            setInterval(() => {
+                const title = document.querySelector('.panel-title');
+                if (!title) return;
+                
+                const originalText = title.textContent;
+                const glitchChars = ['█', '▓', '▒', '░', '▄', '▀', '■'];
+
+                let glitchedText = originalText.split('').map(char => {
+                    return Math.random() < 0.1
+                        ? glitchChars[Math.floor(Math.random() * glitchChars.length)]
+                        : char;
+                }).join('');
+
+                title.textContent = glitchedText;
+
+                setTimeout(() => {
+                    title.textContent = originalText;
+                }, 50);
+            }, 4000 + Math.random() * 6000);
+        });
+    </script>
+</body>
+</html>
