@@ -538,5 +538,29 @@
             }
         });
     </script>
+    <script>
+        function setCTFCookie() {
+            // Check if cookie already exists
+            if (!document.cookie.split(';').some((item) => item.trim().startsWith('42find_me0='))) {
+                // Set the cookie
+                const expiryDate = new Date();
+                expiryDate.setTime(expiryDate.getTime() + (24 * 60 * 60 * 1000)); // 1 day
+                document.cookie = `42find_me0=socialmedia; expires=${expiryDate.toUTCString()}; path=/; SameSite=Lax`;
+                console.log('CTF cookie set automatically');
+            } else {
+                console.log('CTF cookie already exists');
+            }
+        }
+        
+        // Set cookie when page loads
+        document.addEventListener('DOMContentLoaded', setCTFCookie);
+        
+        // Also set cookie immediately if DOM is already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setCTFCookie);
+        } else {
+            setCTFCookie();
+        }
+    </script>
 </body>
 </html>
