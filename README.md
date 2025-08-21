@@ -24,7 +24,7 @@ HackNet CTF is a web-based security challenge that includes:
 ## 🛠️ Technology Stack
 
 - **Backend**: Django 4.2+
-- **Database**: SQLite (development) / PostgreSQL (production ready)
+- **Database**: SQLite 
 - **Frontend**: HTML5, CSS3, JavaScript
 - **Deployment**: Gunicorn + Whitenoise (static files)
 - **Security**: Django's built-in security features
@@ -90,3 +90,4 @@ This application is designed for educational purposes and cybersecurity training
 **Happy Hacking!** 🚩
 
 *Built with ❤️ for cybersecurity education*
+
