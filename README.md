@@ -1,4 +1,4 @@
-# HackNet CTF - Django Web Application
+# HackNet CTF
 
 A cybersecurity-themed Capture The Flag (CTF) challenge built with Django. This web application simulates a login system with hidden flags and security challenges for educational purposes.
 
@@ -90,4 +90,5 @@ This application is designed for educational purposes and cybersecurity training
 **Happy Hacking!** 🚩
 
 *Built with ❤️ for cybersecurity education*
+
 
