@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'hacknet_ctf.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'hacknet-ctf.onrender.com', '*']
 
 # Application definition
 INSTALLED_APPS = [
