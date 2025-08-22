@@ -43,19 +43,6 @@ def authenticate_user(request):
             request.session['username'] = username
             request.session.set_expiry(3600)  # 1 hour
             
-            # Store CTF user in database
-            ctf_user, created = CTFUser.objects.get_or_create(
-                session_key=request.session.session_key,
-                defaults={
-                    'username': username,
-                    'is_authenticated': True,
-                }
-            )
-            if not created:
-                ctf_user.is_authenticated = True
-                ctf_user.username = username
-                ctf_user.save()
-            
             return JsonResponse({
                 'success': True,
                 'message': 'Authentication successful',
