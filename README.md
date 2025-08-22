@@ -31,7 +31,7 @@ HackNet CTF is a web-based security challenge that includes:
 
 ## Deployement Link
 ```URL
-(https://hacknet-ctf.onrender.com/
+https://hacknet-ctf.onrender.com/
 ```
 
 ## 📋 Prerequisites
@@ -95,6 +95,7 @@ This application is designed for educational purposes and cybersecurity training
 **Happy Hacking!** 🚩
 
 *Built with ❤️ for cybersecurity education*
+
 
 
 
